@@ -1,0 +1,71 @@
+<?php
+
+namespace Tests\Unit\Models;
+
+use App\Models\VacancyLevel;
+use PHPUnit\Framework\TestCase;
+
+class VacancyLevelTest extends TestCase
+{
+    /**
+     * @test
+     * @param string $expectedMark
+     * @param int $remainingCount
+     * @dataProvider dataMark
+     */
+    public function testMark(int $remainingCount, string $expectedMark)
+    {
+        $level = new VacancyLevel($remainingCount);
+
+        $this->assertSame($expectedMark, $level->mark());
+    }
+
+    /**
+     * @test
+     * @param string $expectedSlug
+     * @param int $remainingCount
+     * @dataProvider dataSlug
+     */
+    public function testSlug(int $remainingCount, string $expectedSlug)
+    {
+        $level = new VacancyLevel($remainingCount);
+
+        $this->assertSame($expectedSlug, $level->slug());
+    }
+
+    public function dataSlug()
+    {
+        return [
+            '空きなし' => [
+                'remainingCount' => 0,
+                'expectedSlug' => 'empty'
+            ],
+            '残りわずか' => [
+                'remainingCount' => 4,
+                'expectedSlug' => 'few'
+            ],
+            '空き十分' => [
+                'remainingCount' => 5,
+                'expectedSlug' => 'enough'
+            ],
+        ];
+    }
+
+    public function dataMark()
+    {
+        return [
+            '空きなし' => [
+                'remainingCount' => 0,
+                'expectedMark' => 'x'
+            ],
+            '残りわずか' => [
+                'remainingCount' => 4,
+                'expectedMark' => '△'
+            ],
+            '空き十分' => [
+                'remainingCount' => 5,
+                'expectedMark' => '◎'
+            ],
+        ];
+    }
+}
