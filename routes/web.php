@@ -23,6 +23,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::resource('lessons', 'LessonController');
+    Route::post('/lessons/{lesson}/reserve', 'Lesson\ReservationController')->name('lessons.reserve');
 });
 
 Route::resource('reservations', 'ReservationController');

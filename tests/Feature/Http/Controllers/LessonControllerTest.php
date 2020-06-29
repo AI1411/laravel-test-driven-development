@@ -5,14 +5,16 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Lesson;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Models\UserProfile;
+use Tests\Factories\Traits\CreateUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class LessonControllerTest extends TestCase
 {
     use RefreshDatabase;
+    use CreateUser;
 
     /**
      * @test
@@ -28,10 +30,10 @@ class LessonControllerTest extends TestCase
 
         for ($i = 0; $i < $reservationCount; $i++) {
             $user = factory(User::class)->create();
+            factory(UserProfile::class)->create(['user_id' => $user->id]);
             factory(Reservation::class)->create(['lesson_id' => $lesson->id, 'user_id' => $user->id]);
         }
-
-        $user = factory(User::class)->create();
+        $user = $this->createUser();
         $this->actingAs($user);
 
         $response = $this->get("/lessons/{$lesson->id}");
