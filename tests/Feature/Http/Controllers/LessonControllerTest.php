@@ -18,10 +18,11 @@ class LessonControllerTest extends TestCase
      * @test
      * @param int $capacity
      * @param int $reservationCount
+     * @param string $button
      * @dataProvider dataShow
      * @param $expectedVacancyLevelMark
      */
-    public function testShow(int $capacity, int $reservationCount, string $expectedVacancyLevelMark)
+    public function testShow(int $capacity, int $reservationCount, string $expectedVacancyLevelMark, string $button)
     {
         $lesson = factory(Lesson::class)->create(['name' => 'test', 'capacity' => $capacity]);
 
@@ -30,31 +31,41 @@ class LessonControllerTest extends TestCase
             factory(Reservation::class)->create(['lesson_id' => $lesson->id, 'user_id' => $user->id]);
         }
 
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
         $response = $this->get("/lessons/{$lesson->id}");
 
         $response->assertStatus(Response::HTTP_OK);
 
         $response->assertSee($lesson->name);
         $response->assertSee("空き状況: {$expectedVacancyLevelMark}");
+
+        $response->assertSee($button, false);
     }
 
     public function dataShow()
     {
+        $button = '<button class="btn btn-primary">このレッスンを予約する</button>';
+        $span = '<span class="btn btn-primary disabled">予約できません</span>';
         return [
             '空き十分' => [
                 'capacity' => 6,
                 'reservationCount' => 1,
-                'expectedVacancyLevelMark' => '◎'
+                'expectedVacancyLevelMark' => '◎',
+                'button' => $button
             ],
             '空きわずか' => [
                 'capacity' => 6,
                 'reservationCount' => 2,
-                'expectedVacancyLevelMark' => '△'
+                'expectedVacancyLevelMark' => '△',
+                'button' => $button
             ],
             '空きなし' => [
                 'capacity' => 1,
                 'reservationCount' => 1,
-                'expectedVacancyLevelMark' => 'x'
+                'expectedVacancyLevelMark' => 'x',
+                'button' => $span
             ],
         ];
     }
